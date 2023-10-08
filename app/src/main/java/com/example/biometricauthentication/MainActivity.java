@@ -1,12 +1,14 @@
 package com.example.biometricauthentication;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.biometric.BiometricManager;
 import androidx.biometric.BiometricPrompt;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -14,6 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -36,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
         textView = findViewById(R.id.textView);
 
         if(loginStatus == false){
-            BiometricLogin();
+            BiometricLoginPrompt();
         }
 
         LogoutButton.setOnClickListener(new View.OnClickListener() {
@@ -49,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
         LoginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                BiometricLogin();
+                BiometricLoginPrompt();
             }
         });
 
@@ -60,12 +63,12 @@ public class MainActivity extends AppCompatActivity {
         LogoutButton.setVisibility(View.INVISIBLE);
         LoginButton.setVisibility(View.VISIBLE);
         loginStatus = false;
-        BiometricLogin();
+//        BiometricLogin();
     }
 
-    private void BiometricLogin(){
+    private void BiometricLoginPrompt(){
         BiometricManager biometricManager = BiometricManager.from(this);
-        switch (biometricManager.canAuthenticate()) {
+        switch (biometricManager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG )) {
             case BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE:
                 Toast.makeText(getApplicationContext(), "No fingerprint Hardware", Toast.LENGTH_SHORT).show();
                 break;
@@ -76,6 +79,55 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), "No fingerprint Assigned", Toast.LENGTH_SHORT).show();
                 break;
         }
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+//        CombinedAuthenticate();
+        builder.setTitle("Select Authentication Method");
+        builder.setItems(new String[]{"Fingerprint", "Face"}, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                if(i == 0){
+                    AuthenticateWithFingerPrint();
+                }else if(i == 1){
+                    AuthenticateWithFace();
+                }
+            }
+        });
+        builder.create().show();
+    }
+
+    private void CombinedAuthenticate(){
+        Executor executor = ContextCompat.getMainExecutor(this);
+
+        biometricPrompt = new BiometricPrompt(MainActivity.this, executor, new BiometricPrompt.AuthenticationCallback() {
+            @Override
+            public void onAuthenticationError(int errorCode, @NonNull CharSequence errString) {
+                super.onAuthenticationError(errorCode, errString);
+            }
+
+            @Override
+            public void onAuthenticationSucceeded(@NonNull BiometricPrompt.AuthenticationResult result) {
+                super.onAuthenticationSucceeded(result);
+                Toast.makeText(getApplicationContext(), "Success", Toast.LENGTH_SHORT).show();
+                textView.setVisibility(View.VISIBLE);
+                LogoutButton.setVisibility(View.VISIBLE);
+                LoginButton.setVisibility(View.INVISIBLE);
+                loginStatus = true;
+            }
+
+            @Override
+            public void onAuthenticationFailed() {
+                super.onAuthenticationFailed();
+            }
+        });
+
+        promptInfo = new BiometricPrompt.PromptInfo.Builder().setTitle("Biometric Authentication")
+                .setDescription("Place FInger on Sensor or Place Face front of Camera").setDeviceCredentialAllowed(true).build();
+
+        biometricPrompt.authenticate(promptInfo);
+    }
+
+    private void AuthenticateWithFingerPrint() {
 
         Executor executor = ContextCompat.getMainExecutor(this);
 
@@ -101,8 +153,40 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        promptInfo = new BiometricPrompt.PromptInfo.Builder().setTitle("Project")
-                .setDescription("Use FIngerprint to login").setDeviceCredentialAllowed(true).build();
+        promptInfo = new BiometricPrompt.PromptInfo.Builder().setTitle("Fingerprint Authentication")
+                .setDescription("Put Fingerprint on Sensor").setDeviceCredentialAllowed(true).build();
+
+        biometricPrompt.authenticate(promptInfo);
+    }
+
+    private void AuthenticateWithFace() {
+
+        Executor executor = ContextCompat.getMainExecutor(this);
+
+        biometricPrompt = new BiometricPrompt(MainActivity.this, executor, new BiometricPrompt.AuthenticationCallback() {
+            @Override
+            public void onAuthenticationError(int errorCode, @NonNull CharSequence errString) {
+                super.onAuthenticationError(errorCode, errString);
+            }
+
+            @Override
+            public void onAuthenticationSucceeded(@NonNull BiometricPrompt.AuthenticationResult result) {
+                super.onAuthenticationSucceeded(result);
+                Toast.makeText(getApplicationContext(), "Success", Toast.LENGTH_SHORT).show();
+                textView.setVisibility(View.VISIBLE);
+                LogoutButton.setVisibility(View.VISIBLE);
+                LoginButton.setVisibility(View.INVISIBLE);
+                loginStatus = true;
+            }
+
+            @Override
+            public void onAuthenticationFailed() {
+                super.onAuthenticationFailed();
+            }
+        });
+
+        promptInfo = new BiometricPrompt.PromptInfo.Builder().setTitle("Face Authentication")
+                .setDescription("Place Face In-front of Camera").setDeviceCredentialAllowed(true).build();
 
         biometricPrompt.authenticate(promptInfo);
     }
