@@ -26,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
     private Button LogoutButton;
     private Button LoginButton;
     private TextView textView;
+    private  TextView textView2;
 
     private Boolean loginStatus = false;
 
@@ -37,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
         LogoutButton = findViewById(R.id.LogoutButton);
         LoginButton = findViewById(R.id.LoginButton);
         textView = findViewById(R.id.textView);
+        textView2 = findViewById(R.id.textView2);
 
         if(loginStatus == false){
             BiometricLoginPrompt();
@@ -61,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
     private void logout(){
         textView.setVisibility(View.INVISIBLE);
         LogoutButton.setVisibility(View.INVISIBLE);
+        textView2.setVisibility(View.INVISIBLE);
         LoginButton.setVisibility(View.VISIBLE);
         loginStatus = false;
 //        BiometricLogin();
@@ -111,6 +114,7 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), "Success", Toast.LENGTH_SHORT).show();
                 textView.setVisibility(View.VISIBLE);
                 LogoutButton.setVisibility(View.VISIBLE);
+                textView2.setVisibility(View.VISIBLE);
                 LoginButton.setVisibility(View.INVISIBLE);
                 loginStatus = true;
             }
@@ -143,6 +147,7 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), "Success", Toast.LENGTH_SHORT).show();
                 textView.setVisibility(View.VISIBLE);
                 LogoutButton.setVisibility(View.VISIBLE);
+                textView2.setVisibility(textView.VISIBLE);
                 LoginButton.setVisibility(View.INVISIBLE);
                 loginStatus = true;
             }
@@ -175,6 +180,7 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), "Success", Toast.LENGTH_SHORT).show();
                 textView.setVisibility(View.VISIBLE);
                 LogoutButton.setVisibility(View.VISIBLE);
+                textView2.setVisibility(textView.VISIBLE);
                 LoginButton.setVisibility(View.INVISIBLE);
                 loginStatus = true;
             }
